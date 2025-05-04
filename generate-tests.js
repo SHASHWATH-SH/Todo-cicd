@@ -1,6 +1,7 @@
-// generate-tests.js
-const fs = require('fs');
-const axios = require('axios');
+import fs from 'fs';
+import axios from 'axios';
+import { config } from 'dotenv';
+config();
 
 const openaiApiKey = process.env.OPENAI_API_KEY;
 
