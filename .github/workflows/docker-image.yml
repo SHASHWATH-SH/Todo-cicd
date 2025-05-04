@@ -1,39 +1,45 @@
-name: CI/CD Pipeline
+name: Generate Tests & Build React Docker Image
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
-  build-and-test:
+  build-and-push:
     runs-on: ubuntu-latest
 
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
     steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Node
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '18'
 
-      - name: Cache node_modules
-        uses: actions/cache@v3
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
-
-      - name: Install dependencies
+      - name: Install Dependencies
         run: npm install
 
-      - name: Run tests
-        run: npm test -- --watchAll=false
+      - name: Generate Jest Test File using OpenAI API
+        run: node generate-tests.js
 
-      - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/todo-app:latest .
+      - name: Commit and Push Generated Test
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/App.test.js
+          git commit -m "🤖 auto: generated test using OpenAI API"
+          git push
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Run Tests
+        run: npm test -- --watchAll=false
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -41,5 +47,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Push Docker image
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/todo-app:latest
+      - name: Build Docker Image (React + Nginx)
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/todo-app:latest .
+
+      - name: Push Docker Image to Docker Hub
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/todo-app:latest
