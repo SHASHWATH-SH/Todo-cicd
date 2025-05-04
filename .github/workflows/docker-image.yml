@@ -10,28 +10,44 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Set up Node.js
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
+      # Cache Node.js modules to speed up installs
+      - name: Cache Node modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      # Install dependencies
       - name: Install dependencies
         run: npm install
 
+      # Run tests
       - name: Run tests
         run: npm test -- --watchAll=false
 
+      # Build the Docker image with a version tag (e.g., using Git commit SHA)
       - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/todo-app:latest .
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/todo-app:${{ github.sha }} .
 
+      # Log in to Docker Hub
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      # Push Docker image
       - name: Push Docker image
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/todo-app:latest
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/todo-app:${{ github.sha }}

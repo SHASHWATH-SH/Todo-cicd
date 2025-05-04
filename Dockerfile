@@ -1,27 +1,29 @@
-# Step 1: Build the React app using Node.js
-FROM node:20-alpine AS build
+# Use the official Node.js image
+FROM node:18-alpine
 
 # Set the working directory inside the container
 WORKDIR /app
 
-# Install dependencies
-COPY package*.json ./
-RUN npm install
+# Copy the package.json and package-lock.json
+COPY package.json package-lock.json ./
 
-# Copy the rest of your application
+# Install dependencies with --legacy-peer-deps to bypass dependency conflicts
+RUN npm install --legacy-peer-deps
+
+# Copy the rest of your application code
 COPY . .
 
 # Build the React app
 RUN npm run build
 
-# Step 2: Set up the production server using Nginx
+# Use Nginx to serve the app
 FROM nginx:alpine
 
 # Copy the build files from the previous stage
-COPY --from=build /app/build /usr/share/nginx/html
+COPY --from=0 /app/build /usr/share/nginx/html
 
-# Expose port 80 to access the app
+# Expose port 80
 EXPOSE 80
 
-# Start Nginx to serve the app
+# Start Nginx
 CMD ["nginx", "-g", "daemon off;"]
