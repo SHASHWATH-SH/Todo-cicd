@@ -1,5 +1,5 @@
-const axios = require('axios');
-const fs = require('fs');
+import axios from 'axios'; // Use import instead of require
+import fs from 'fs';
 
 // Your OpenAI API key
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
