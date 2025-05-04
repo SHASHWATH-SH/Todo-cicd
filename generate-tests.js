@@ -1,43 +1,53 @@
 import fs from 'fs';
 import axios from 'axios';
-import { config } from 'dotenv';
-config();
+import path from 'path';
 
-const openaiApiKey = process.env.OPENAI_API_KEY;
-
-const prompt = `
-Write unit tests in JavaScript using Jest for the following code.
-Code:
-${fs.readFileSync('./src/App.js', 'utf-8')}
-`;
-
-async function generateTests() {
-  try {
-    const response = await axios.post(
-      'https://api.openai.com/v1/chat/completions',
-      {
-        model: 'gpt-3.5-turbo',
-        messages: [
-          { role: 'system', content: 'You are an expert JavaScript developer.' },
-          { role: 'user', content: prompt }
-        ],
-        temperature: 0.2
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${openaiApiKey}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-
-    const generatedTest = response.data.choices[0].message.content;
-
-    fs.writeFileSync('./src/App.test.js', generatedTest);
-    console.log('✅ Test case generated successfully!');
-  } catch (error) {
-    console.error('❌ Error generating test:', error.response?.data || error.message);
-  }
+// Ensure src directory exists
+const testDir = './src';
+if (!fs.existsSync(testDir)) {
+  fs.mkdirSync(testDir);
 }
 
-generateTests();
+// Construct the prompt
+const prompt = `
+Write a basic Jest test file for a React component named App.
+Assume the App component renders a heading with the text "My Todo App".
+Write the test in a file called App.test.js using @testing-library/react.
+`;
+
+// Send request to OpenAI API
+const apiKey = process.env.OPENAI_API_KEY;
+const endpoint = 'https://api.openai.com/v1/chat/completions';
+
+try {
+  const response = await axios.post(
+    endpoint,
+    {
+      model: 'gpt-3.5-turbo',
+      messages: [
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
+      temperature: 0.5,
+      max_tokens: 300,
+    },
+    {
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+
+  const testCode = response.data.choices[0].message.content;
+
+  // Write the test file
+  fs.writeFileSync(path.join(testDir, 'App.test.js'), testCode);
+  console.log('✅ Test file generated successfully!');
+
+} catch (error) {
+  console.error('❌ Error generating test:', error.message);
+  process.exit(1);
+}
