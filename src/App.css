@@ -1,9 +1,7 @@
-
-
 .todo-text{
   color: red;
   word-wrap: break-word;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 100%; /* Ensure it doesn't exceed the container width */
+  max-width: 100%;
 }
