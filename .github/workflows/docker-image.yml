@@ -12,6 +12,7 @@ jobs:
 
     env:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}  # Ensure this token has the necessary permissions (repo scope)
 
     steps:
       - name: Checkout Repository
@@ -28,13 +29,14 @@ jobs:
       - name: Generate Jest Test File using OpenAI API
         run: node generate-tests.js
 
-      - name: Commit and Push Generated Test
+      - name: Commit and Push Generated Test (if any changes)
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add src/App.test.js || echo "No changes to commit"
-          git diff --cached --quiet || git commit -m "🤖 auto: generated test using OpenAI API"
-          git push
+          
+          # Check if there are changes to commit and push
+          git diff --exit-code || (git add src/App.test.js && git commit -m "🤖 auto: generated test using OpenAI API" && git push)
+
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
@@ -42,18 +44,15 @@ jobs:
         run: npm test -- --watchAll=false
 
       - name: Log in to Docker Hub
-        if: success()
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build Docker Image (React + Nginx)
-        if: success()
         run: |
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/todo-app:latest .
 
       - name: Push Docker Image to Docker Hub
-        if: success()
         run: |
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/todo-app:latest
