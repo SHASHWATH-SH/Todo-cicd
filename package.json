@@ -3,13 +3,12 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-"scripts": {
-  "start": "react-scripts start",
-  "build": "react-scripts build",
-  "test": "react-scripts test",
-  "eject": "react-scripts eject"
-}
-,
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -19,6 +18,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.11.1",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
     "@types/react": "^18.3.10",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.2",
@@ -28,17 +29,11 @@
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.12",
     "globals": "^15.9.0",
+    "jest": "^27.5.1",
     "postcss": "^8.4.47",
+    "react-app-rewired": "^2.2.1",
     "react-scripts": "^5.0.1",
     "tailwindcss": "^3.4.14",
     "vite": "^5.4.8"
-  },
-"jest": {
-  "testMatch": [
-    "**/src/**/*.test.js",
-    "**/src/**/*.spec.js",
-    "**/__tests__/**/*.{js,jsx,ts,tsx}"
-  ]
-}
-
+  }
 }
