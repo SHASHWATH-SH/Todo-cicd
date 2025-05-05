@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
-import App from '../App'; // Adjust path if needed
+import App from '../App';
 
-test('renders welcome message', () => {
+test('renders My Todo App heading', () => {
   render(<App />);
-  const headerElement = screen.getByText(/Add a Todo/i);  // Adjust the text to match an element in your App
-  expect(headerElement).toBeInTheDocument();
+  const headingElement = screen.getByText(/Add a Todo/i);
+  expect(headingElement).toBeInTheDocument();
 });
