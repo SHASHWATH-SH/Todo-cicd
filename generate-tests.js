@@ -1,3 +1,4 @@
+// generate-tests.cjs
 const fs = require("fs");
 const path = require("path");
 const { OpenAI } = require("openai");
@@ -13,7 +14,7 @@ const generateTests = async () => {
 
   const appCode = fs.readFileSync(appPath, "utf-8");
 
-  const prompt = `Write a Jest + React Testing Library test suite for this React component:\n\n${appCode}`;
+  const prompt = `Write a complete test suite using Jest and React Testing Library for this React component:\n\n${appCode}`;
 
   const response = await openai.chat.completions.create({
     model: "gpt-4",
@@ -27,7 +28,7 @@ const generateTests = async () => {
   if (!fs.existsSync(testDir)) fs.mkdirSync(testDir, { recursive: true });
 
   fs.writeFileSync(path.join(testDir, "App.test.js"), testCode);
-  console.log("✅ Test generated in src/__tests__/App.test.js");
+  console.log("✅ Test file written to src/__tests__/App.test.js");
 };
 
 generateTests().catch(console.error);
