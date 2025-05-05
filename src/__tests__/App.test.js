@@ -3,6 +3,6 @@ import App from '../App';
 
 test('renders My Todo App heading', () => {
   render(<App />);
-  const headingElement = screen.getByText(/Add a Todo/i);
+  const headingElement = screen.getByText(/iTask/i);
   expect(headingElement).toBeInTheDocument();
 });
