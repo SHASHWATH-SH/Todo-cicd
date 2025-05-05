@@ -22,10 +22,10 @@ jobs:
         run: npm install
 
       - name: Generate test cases using OpenAI
+        run: node generate-tests.cjs
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: node generate-tests.js
-
+      
       - name: Run tests
         run: npm test -- --watchAll=false
 
