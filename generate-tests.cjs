@@ -22,7 +22,7 @@ import App from '../App';
 
 test('renders the Todo App header', () => {
   render(<App />);
-  const headerElement = screen.getByText(/Todo App/i);
+  const headerElement = screen.getByText(/Add a todo/i);
   expect(headerElement).toBeInTheDocument();
 });
 `;
